@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Genius.Common;
@@ -26,10 +27,10 @@ namespace Genius.Lyrics.Wikia
             _client = client;
         }
 
-        public async Common.Lyrics GrabLyrics(object parameters)
+        public async Task<Common.Lyrics> GrabLyrics(object parameters)
         {
 
-            var task = client.GetAsync("http://lyrics.wikia.com/api.php?func=getSong&fmt=xml&" + parameters);
+            var task = _client.GetAsync("http://lyrics.wikia.com/api.php?func=getSong&fmt=xml&" + parameters);
             return await task.ContinueWith((Task<HttpResponseMessage> taskwithresponse) =>
             {
                 var response = taskwithresponse.Result;
@@ -44,7 +45,12 @@ namespace Genius.Lyrics.Wikia
 
                     IWebElement linkElement = _driver.FindElement(By.CssSelector(".lyricbox"));
 
-                    Console.WriteLine(linkElement.Text);
+                    return linkElement.Text;
+                }
+
+                return new Common.Lyrics()
+                {
+                    
                 }
 
             });
